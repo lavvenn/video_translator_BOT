@@ -103,6 +103,6 @@ async def all_message(message: Message):
 
     output = argostranslate.translate.translate(message.text, from_code, to_code)
 
-    print(output)
+    print(f'перевелось на: {output}')
 
     await message.answer(output)
