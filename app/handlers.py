@@ -1,5 +1,8 @@
 import logging
 import os
+import subprocess
+import sys
+
 
 #подключение aiogram
 from aiogram import Bot, Router, F      
@@ -37,17 +40,14 @@ def update(messages, role, content):
     messages.append({'role': role, 'content': content})
     return messages
 
-def list_to_str(list):
-    output_str = ''
-    for i in range(0,len(list)) :
-          output_str = output_str + str(i + 1) + '.' + ' ' + list[i] + ' '
-    return output_str
-    
-
-
-
-vac_list = ['HR menger','frontend developer']
-
+#функция преоброзования видио в текст
+def convert_video_to_audio_ffmpeg(video_file, output_ext="mp3"):
+    """Преобразует видео в аудио напрямую с помощью команды `ffmpeg`
+    с помощью модуля подпроцесса"""
+    filename, ext = os.path.splitext(video_file)
+    subprocess.call(["ffmpeg", "-y", "-i", video_file, f"{filename}.{output_ext}"], 
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.STDOUT)
 
 #handler команды  "start"
 @router.message(F.text == '/start')                             
@@ -91,6 +91,8 @@ async def handle_video(message: Message):
     print(video_path)
     with open(video_path, 'wb') as video_file_local:
         video_file_local.write(video_file.read())
+
+    convert_video_to_audio_ffmpeg(video_path)
     
     await message.answer(f'Видео сохранено в {video_path}')
 
